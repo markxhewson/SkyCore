@@ -26,7 +26,7 @@ public class DataUpdateThread extends Thread {
             }
 
             try {
-                sleep(50 * 20);
+                sleep(2000);
             } catch (InterruptedException exception) {
                 exception.printStackTrace();
             }

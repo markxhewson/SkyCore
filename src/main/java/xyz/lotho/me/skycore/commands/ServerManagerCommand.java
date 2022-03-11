@@ -39,7 +39,17 @@ public class ServerManagerCommand implements CommandExecutor {
             player.sendMessage(this.getServersFormatted());
             return true;
         }
-        else if (args.length >= 4 && args[0].equalsIgnoreCase("execute")) {
+        else if (args.length >= 2 && args[0].equalsIgnoreCase("info")) {
+            JsonObject jsonObject = this.instance.serverManager.getServer(args[1]);
+
+            if (jsonObject == null) {
+                player.sendMessage(this.getHelp());
+                return false;
+            }
+
+            player.sendMessage(this.getServerFormatted(jsonObject.get("serverName").getAsString(), jsonObject));
+        }
+        else if (args.length >= 3 && args[0].equalsIgnoreCase("execute")) {
             JsonObject jsonObject = new JsonObject();
 
             jsonObject.addProperty("serverName", args[1]);
@@ -56,7 +66,34 @@ public class ServerManagerCommand implements CommandExecutor {
     }
 
     public String getHelp() {
-        return Utilities.color("&cInvalid arguments! Usage: /servermanager <args> <optional>\n &8- &7args: list, execute\n &8- &7optional: command");
+        return Utilities.color("&cInvalid arguments! Usage: /servermanager <args> <optional>\n &8- &7args: list, info, execute\n &8- &7optional: serverName, command");
+    }
+
+    public String getServerFormatted(String serverName, JsonObject jsonObject) {
+        String online = jsonObject.get("online").getAsBoolean() ? "&aTrue" : "&cFalse";
+        String whitelisted = jsonObject.get("whitelisted").getAsBoolean() ? "&aTrue" : "&cFalse";
+
+        int onlineCount = jsonObject.get("onlinePlayers").getAsInt();
+        int maxPlayers = jsonObject.get("maxPlayers").getAsInt();
+
+        float tps = jsonObject.get("tps1").getAsFloat();
+        float tps2 = jsonObject.get("tps2").getAsFloat();
+        float tps3 = jsonObject.get("tps3").getAsFloat();
+
+        String updatedAgo = this.instance.serverManager.getTimeFromLastUpdate(jsonObject.get("serverName").getAsString(), jsonObject.get("lastUpdated").getAsLong());
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(Utilities.color("\n&e&lServer Manager &a")).append(serverName).append("\n");
+        builder.append(Utilities.color(" &e» &fOnline: " + online)).append("\n");
+        builder.append(Utilities.color(" &e» &fPlayers: &7" + onlineCount + "/" + maxPlayers)).append("\n");
+        builder.append(Utilities.color(" &e» &fTPS Data: " + TPSManager.getFormattedTPS(tps) + " " + TPSManager.getFormattedTPS(tps2) + " " + TPSManager.getFormattedTPS(tps3) + " &7(" + TPSManager.getTPSStatus(tps) + "&7)")).append("\n");
+        builder.append(Utilities.color(" &e» &fWhitelisted: " + whitelisted)).append("\n");
+        builder.append(Utilities.color(" &e» &fVersion: &6" + jsonObject.get("spigotVersion").getAsString())).append("\n");
+        builder.append(Utilities.color(" &e» &fLast Updated: &8" + updatedAgo + "s ago")).append("\n");
+        builder.append("\n ");
+
+        return builder.toString();
     }
 
     public String getServersFormatted() {
@@ -71,7 +108,7 @@ public class ServerManagerCommand implements CommandExecutor {
 
             float tps = serverData.get("tps1").getAsFloat();
 
-            String updatedAgo = new DecimalFormat("#.##").format((float) (System.currentTimeMillis() - serverData.get("lastUpdated").getAsLong()) / 1000);
+            String updatedAgo = this.instance.serverManager.getTimeFromLastUpdate(serverName, serverData.get("lastUpdated").getAsLong());
 
             String line = " &e» &a" + serverName + " &7(" + onlineCount + "/" + maxPlayers + ") : " + online + " &7" + version + " " + "(" + TPSManager.getTPSStatus(tps) + " TPS&7)" + " &8(Updated " + updatedAgo + "s ago)";
             stringBuilder.append("\n").append(Utilities.color(line));

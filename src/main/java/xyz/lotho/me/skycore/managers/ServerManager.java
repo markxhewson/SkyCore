@@ -3,6 +3,7 @@ package xyz.lotho.me.skycore.managers;
 import com.google.gson.JsonObject;
 import xyz.lotho.me.skycore.SkyCore;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 
 public class ServerManager {
@@ -47,6 +48,10 @@ public class ServerManager {
     public void setServerOnlineStatus(String serverName, boolean serverStatus) {
         JsonObject jsonObject = this.getServer(serverName);
         jsonObject.addProperty("online", serverStatus);
+    }
+
+    public String getTimeFromLastUpdate(String serverName, long lastUpdate) {
+        return new DecimalFormat("#.##").format((float) (System.currentTimeMillis() - lastUpdate) / 1000);
     }
 
     public void updateServer(String serverName, JsonObject newJsonObject) {
