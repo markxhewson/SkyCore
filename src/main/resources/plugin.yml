@@ -1,0 +1,11 @@
+name: SkyCore
+version: '${project.version}'
+main: xyz.lotho.me.skycore.SkyCore
+api-version: 1.18
+authors: [ markxhewson ]
+description: An advanced core for Minecraft.
+
+commands:
+  servermanager:
+    aliases:
+      - sm

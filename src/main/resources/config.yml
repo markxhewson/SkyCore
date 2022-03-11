@@ -1,0 +1,11 @@
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  password: ""
+  channel: "SkyCloud"
+
+server:
+  name: hub-1
+
+utils:
+  adminPerm: 'skycloud.admin'
