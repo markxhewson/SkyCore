@@ -1,17 +1,15 @@
 package xyz.lotho.me.skycore.commands;
 
 import com.google.gson.JsonObject;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import xyz.lotho.me.skycore.SkyCore;
+import xyz.lotho.me.skycore.handlers.Server;
 import xyz.lotho.me.skycore.managers.TPSManager;
 import xyz.lotho.me.skycore.storage.impl.ServerCommandPacket;
 import xyz.lotho.me.skycore.utils.Utilities;
-
-import java.text.DecimalFormat;
 
 public class ServerManagerCommand implements CommandExecutor {
 
@@ -40,14 +38,14 @@ public class ServerManagerCommand implements CommandExecutor {
             return true;
         }
         else if (args.length >= 2 && args[0].equalsIgnoreCase("info")) {
-            JsonObject jsonObject = this.instance.serverManager.getServer(args[1]);
+            Server server = this.instance.serverManager.getServer(args[1]);
 
-            if (jsonObject == null) {
+            if (server == null) {
                 player.sendMessage(this.getHelp());
                 return false;
             }
 
-            player.sendMessage(this.getServerFormatted(jsonObject.get("serverName").getAsString(), jsonObject));
+            player.sendMessage(this.getServerFormatted(server.getServerName(), server));
         }
         else if (args.length >= 3 && args[0].equalsIgnoreCase("execute")) {
             JsonObject jsonObject = new JsonObject();
@@ -69,27 +67,27 @@ public class ServerManagerCommand implements CommandExecutor {
         return Utilities.color("&cInvalid arguments! Usage: /servermanager <args> <optional>\n &8- &7args: list, info, execute\n &8- &7optional: serverName, command");
     }
 
-    public String getServerFormatted(String serverName, JsonObject jsonObject) {
-        String online = jsonObject.get("online").getAsBoolean() ? "&aTrue" : "&cFalse";
-        String whitelisted = jsonObject.get("whitelisted").getAsBoolean() ? "&aTrue" : "&cFalse";
+    public String getServerFormatted(String serverName, Server server) {
+        String online = server.isOnline() ? "&aTrue" : "&cFalse";
+        String whitelisted = server.isWhitelisted() ? "&aTrue" : "&cFalse";
 
-        int onlineCount = jsonObject.get("onlinePlayers").getAsInt();
-        int maxPlayers = jsonObject.get("maxPlayers").getAsInt();
+        int onlineCount = server.getOnlinePlayers();
+        int maxPlayers = server.getMaxPlayers();
 
-        float tps = jsonObject.get("tps1").getAsFloat();
-        float tps2 = jsonObject.get("tps2").getAsFloat();
-        float tps3 = jsonObject.get("tps3").getAsFloat();
+        float tps = server.getTps1();
+        float tps2 = server.getTps2();
+        float tps3 = server.getTps3();
 
-        String updatedAgo = this.instance.serverManager.getTimeFromLastUpdate(jsonObject.get("serverName").getAsString(), jsonObject.get("lastUpdated").getAsLong());
+        String updatedAgo = server.getLastUpdatedTimeFormatted();
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(Utilities.color("\n&e&lServer Manager &a"));
 
-        builder.append(Utilities.color("\n&e&lServer Manager &a")).append(serverName).append("\n");
+        builder.append(serverName).append("\n");
         builder.append(Utilities.color(" &e» &fOnline: " + online)).append("\n");
         builder.append(Utilities.color(" &e» &fPlayers: &7" + onlineCount + "/" + maxPlayers)).append("\n");
         builder.append(Utilities.color(" &e» &fTPS Data: " + TPSManager.getFormattedTPS(tps) + " " + TPSManager.getFormattedTPS(tps2) + " " + TPSManager.getFormattedTPS(tps3) + " &7(" + TPSManager.getTPSStatus(tps) + "&7)")).append("\n");
         builder.append(Utilities.color(" &e» &fWhitelisted: " + whitelisted)).append("\n");
-        builder.append(Utilities.color(" &e» &fVersion: &6" + jsonObject.get("spigotVersion").getAsString())).append("\n");
+        builder.append(Utilities.color(" &e» &fVersion: &6" + server.getSpigotVersion())).append("\n");
         builder.append(Utilities.color(" &e» &fLast Updated: &8" + updatedAgo + "s ago")).append("\n");
         builder.append("\n ");
 
@@ -99,16 +97,16 @@ public class ServerManagerCommand implements CommandExecutor {
     public String getServersFormatted() {
         StringBuilder stringBuilder = new StringBuilder(Utilities.color("\n&e&lServer Manager"));
 
-        this.instance.serverManager.getServers().forEach((serverName, serverData) -> {
-            String online = serverData.get("online").getAsBoolean() ? "&aOnline" : "&cOffline";
-            String version = serverData.get("spigotVersion").getAsString();
+        this.instance.serverManager.getServers().forEach((serverName, server) -> {
+            String online = server.isOnline() ? "&aOnline" : "&cOffline";
+            String version = server.getSpigotVersion();
 
-            int onlineCount = serverData.get("onlinePlayers").getAsInt();
-            int maxPlayers = serverData.get("maxPlayers").getAsInt();
+            int onlineCount = server.getOnlinePlayers();
+            int maxPlayers = server.getMaxPlayers();
 
-            float tps = serverData.get("tps1").getAsFloat();
+            float tps = server.getTps1();
 
-            String updatedAgo = this.instance.serverManager.getTimeFromLastUpdate(serverName, serverData.get("lastUpdated").getAsLong());
+            String updatedAgo = server.getLastUpdatedTimeFormatted();
 
             String line = " &e» &a" + serverName + " &7(" + onlineCount + "/" + maxPlayers + ") : " + online + " &7" + version + " " + "(" + TPSManager.getTPSStatus(tps) + " TPS&7)" + " &8(Updated " + updatedAgo + "s ago)";
             stringBuilder.append("\n").append(Utilities.color(line));

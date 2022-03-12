@@ -48,6 +48,7 @@ public class RedisManager {
         this.auth = this.password != null && this.password.length() > 0;
 
         Utilities.log("[REDIS] Attempting to connect to Redis Database (" + host + ":" + port + ")");
+        Utilities.adminLog(this.instance, "&c[ADMIN] &a[REDIS] &eAttempting to connect to Redis Database &7(" + host + ":" + port + ")");
 
         this.channel = this.instance.config.get().getString("redis.channel");
 

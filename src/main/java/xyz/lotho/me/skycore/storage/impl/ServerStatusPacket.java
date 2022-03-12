@@ -15,8 +15,7 @@ public class ServerStatusPacket {
         String serverName = jsonObject.get("serverName").getAsString();
 
         if (!this.instance.serverManager.serverExists(serverName)) this.instance.serverManager.addServer(serverName);
-
-        this.instance.serverManager.updateServer(serverName, jsonObject);
+        else this.instance.serverManager.updateServer(serverName, jsonObject);
     }
 
     public void send(JsonObject jsonObject) {

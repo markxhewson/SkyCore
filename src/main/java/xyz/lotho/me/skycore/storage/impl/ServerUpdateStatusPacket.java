@@ -2,6 +2,7 @@ package xyz.lotho.me.skycore.storage.impl;
 
 import com.google.gson.JsonObject;
 import xyz.lotho.me.skycore.SkyCore;
+import xyz.lotho.me.skycore.handlers.Server;
 import xyz.lotho.me.skycore.utils.Utilities;
 
 public class ServerUpdateStatusPacket {
@@ -18,13 +19,11 @@ public class ServerUpdateStatusPacket {
 
         if (!this.instance.serverManager.serverExists(serverName)) this.instance.serverManager.addServer(serverName);
 
-        this.instance.getServer().getOnlinePlayers().stream().filter((player) -> player.hasPermission(this.instance.config.get().getString("utils.adminPerm"))).forEach((player) -> {
+        if (online) Utilities.adminLog(this.instance, "&c[ADMIN] &a" + serverName + " &ehas just came online. &7(STATUS: CONNECTABLE)");
+        else Utilities.adminLog(this.instance, "&c[ADMIN] &a" + serverName + " &ehas just went offline&e! &7(STATUS: NOT CONNECTABLE)");
 
-            if (online) player.sendMessage(Utilities.color("&c[ADMIN] &a" + serverName + " &ehas just came online. &7(STATUS: CONNECTABLE)"));
-            else player.sendMessage(Utilities.color("&c[ADMIN] &a" + serverName + " &ehas just went offline&e! &7(STATUS: NOT CONNECTABLE)"));
-
-            this.instance.serverManager.setServerOnlineStatus(serverName, online);
-        });
+        Server server = this.instance.serverManager.getServer(serverName);
+        server.setOnline(online);
     }
 
     public void send(JsonObject jsonObject) {
