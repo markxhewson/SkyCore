@@ -28,7 +28,6 @@ public class ServerUpdateStatusPacket {
 
     public void send(JsonObject jsonObject) {
         jsonObject.addProperty("id", this.getId());
-
         this.instance.redisManager.sendRequest(this.instance.redisManager.getChannel(), jsonObject);
     }
 

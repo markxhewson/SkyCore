@@ -111,8 +111,8 @@ public class ServerManagerCommand implements CommandExecutor {
             String line = " &e» &a" + serverName + " &7(" + onlineCount + "/" + maxPlayers + ") : " + online + " &7" + version + " " + "(" + TPSManager.getTPSStatus(tps) + " TPS&7)" + " &8(Updated " + updatedAgo + "s ago)";
             stringBuilder.append("\n").append(Utilities.color(line));
         });
-
         stringBuilder.append("\n ");
+
         return stringBuilder.toString();
     }
 }

@@ -2,6 +2,7 @@ package xyz.lotho.me.skycore.storage.impl;
 
 import com.google.gson.JsonObject;
 import xyz.lotho.me.skycore.SkyCore;
+import xyz.lotho.me.skycore.handlers.Server;
 
 public class ServerStatusPacket {
 
@@ -15,12 +16,14 @@ public class ServerStatusPacket {
         String serverName = jsonObject.get("serverName").getAsString();
 
         if (!this.instance.serverManager.serverExists(serverName)) this.instance.serverManager.addServer(serverName);
-        else this.instance.serverManager.updateServer(serverName, jsonObject);
+        else {
+            Server server = this.instance.serverManager.getServer(serverName);
+            server.update(jsonObject);
+        }
     }
 
     public void send(JsonObject jsonObject) {
         jsonObject.addProperty("id", this.getId());
-
         this.instance.redisManager.sendRequest(this.instance.redisManager.getChannel(), jsonObject);
     }
 

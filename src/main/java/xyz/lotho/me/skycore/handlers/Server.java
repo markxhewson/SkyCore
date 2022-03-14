@@ -1,13 +1,10 @@
 package xyz.lotho.me.skycore.handlers;
 
 import com.google.gson.JsonObject;
-import xyz.lotho.me.skycore.SkyCore;
 
 import java.text.DecimalFormat;
 
 public class Server {
-
-    private final SkyCore instance;
 
     private String serverName;
     private String spigotVersion;
@@ -19,10 +16,6 @@ public class Server {
     private boolean online;
     private boolean whitelisted;
     private long lastUpdated;
-
-    public Server(SkyCore instance) {
-        this.instance = instance;
-    }
 
     public void update(JsonObject jsonObject) {
         this.setServerName(jsonObject.get("serverName").getAsString());

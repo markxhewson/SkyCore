@@ -1,23 +1,23 @@
 package xyz.lotho.me.skycore.managers;
 
-import com.google.gson.JsonObject;
 import xyz.lotho.me.skycore.SkyCore;
 import xyz.lotho.me.skycore.handlers.Server;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ServerManager {
 
     private final SkyCore instance;
 
-    private HashMap<String, Server> servers = new HashMap<>();
+    private Map<String, Server> serversMap = new HashMap<>();
 
     public ServerManager(SkyCore instance) {
         this.instance = instance;
     }
 
-    public HashMap<String, Server> getServers() {
-        return this.servers;
+    public Map<String, Server> getServers() {
+        return this.serversMap;
     }
 
     public Server getServer(String serverName) {
@@ -25,17 +25,10 @@ public class ServerManager {
     }
 
     public boolean serverExists(String serverName) {
-        return this.servers.containsKey(serverName);
+        return this.serversMap.containsKey(serverName);
     }
 
     public void addServer(String serverName) {
-        this.servers.put(serverName, new Server(this.instance));
-    }
-
-    public void updateServer(String serverName, JsonObject jsonObject) {
-        if (!this.serverExists(serverName)) this.addServer(serverName);
-
-        Server server = this.getServers().get(serverName);
-        server.update(jsonObject);
+        this.serversMap.put(serverName, new Server());
     }
 }

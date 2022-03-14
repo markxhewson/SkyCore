@@ -26,7 +26,7 @@ public class DataUpdateThread extends Thread {
             }
 
             try {
-                sleep(2000);
+                sleep(3000);
             } catch (InterruptedException exception) {
                 exception.printStackTrace();
             }
@@ -34,8 +34,6 @@ public class DataUpdateThread extends Thread {
     }
 
     public void check() {
-        if (!this.instance.isEnabled()) return;
-
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("serverName", this.instance.config.get().getString("server.name"));
         jsonObject.addProperty("onlinePlayers", this.instance.getServer().getOnlinePlayers().size());
