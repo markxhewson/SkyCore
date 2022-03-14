@@ -3,12 +3,12 @@ package xyz.lotho.me.skycore.data;
 import com.google.gson.JsonObject;
 import xyz.lotho.me.skycore.SkyCore;
 import xyz.lotho.me.skycore.managers.TPSManager;
-import xyz.lotho.me.skycore.storage.impl.ServerStatusPacket;
-import xyz.lotho.me.skycore.storage.impl.ServerUpdateStatusPacket;
+import xyz.lotho.me.skycore.storage.redis.impl.player.GlobalPlayerUpdatePacket;
+import xyz.lotho.me.skycore.storage.redis.impl.server.ServerStatusUpdatePacket;
 
 public class DataUpdateThread extends Thread {
 
-    private SkyCore instance;
+    private final SkyCore instance;
 
     public DataUpdateThread(SkyCore instance) {
         this.instance = instance;
@@ -34,18 +34,28 @@ public class DataUpdateThread extends Thread {
     }
 
     public void check() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("serverName", this.instance.config.get().getString("server.name"));
-        jsonObject.addProperty("onlinePlayers", this.instance.getServer().getOnlinePlayers().size());
-        jsonObject.addProperty("maxPlayers", this.instance.getServer().getMaxPlayers());
-        jsonObject.addProperty("spigotVersion", this.instance.getServer().getVersion());
-        jsonObject.addProperty("whitelisted", this.instance.getServer().hasWhitelist());
-        jsonObject.addProperty("tps1", TPSManager.getRecentTps()[0]);
-        jsonObject.addProperty("tps2", TPSManager.getRecentTps()[1]);
-        jsonObject.addProperty("tps3", TPSManager.getRecentTps()[2]);
-        jsonObject.addProperty("lastUpdated", System.currentTimeMillis());
-        jsonObject.addProperty("online", true);
+        if (this.instance.isDisabling()) return;
 
-        new ServerStatusPacket(this.instance).send(jsonObject);
+        JsonObject serverJson = new JsonObject();
+        serverJson.addProperty("serverName", this.instance.config.get().getString("server.name"));
+        serverJson.addProperty("onlinePlayers", this.instance.getServer().getOnlinePlayers().size());
+        serverJson.addProperty("maxPlayers", this.instance.getServer().getMaxPlayers());
+        serverJson.addProperty("version", this.instance.getServer().getVersion());
+        serverJson.addProperty("whitelisted", this.instance.getServer().hasWhitelist());
+        serverJson.addProperty("tps1", TPSManager.getRecentTps()[0]);
+        serverJson.addProperty("tps2", TPSManager.getRecentTps()[1]);
+        serverJson.addProperty("tps3", TPSManager.getRecentTps()[2]);
+        serverJson.addProperty("lastUpdated", System.currentTimeMillis());
+        serverJson.addProperty("online", true);
+
+        new ServerStatusUpdatePacket(this.instance).send(serverJson);
+
+        this.instance.getServer().getOnlinePlayers().forEach((player) -> {
+            JsonObject playerJson = new JsonObject();
+            playerJson.addProperty("uuid", player.getUniqueId().toString());
+            playerJson.addProperty("firstLogin", System.currentTimeMillis());
+
+            new GlobalPlayerUpdatePacket(this.instance).send(playerJson);
+        });
     }
 }

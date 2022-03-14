@@ -1,0 +1,17 @@
+ranks:
+  ADMIN:
+    name: 'Admin'
+    prefix: '&8[&6Admin&8] '
+    default: false
+    weight: 100
+    type: 'STAFF'
+    inheritence: []
+    permissions: []
+  DEFAULT:
+    name: 'Default'
+    prefix: '&8[&7Member&8] '
+    default: true
+    weight: 0
+    type: 'DEFAULT'
+    inheritence: []
+    permissions: []

@@ -1,4 +1,4 @@
-package xyz.lotho.me.skycore.storage;
+package xyz.lotho.me.skycore.storage.redis;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -8,12 +8,12 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisPubSub;
 import xyz.lotho.me.skycore.SkyCore;
-import xyz.lotho.me.skycore.storage.impl.ServerCommandPacket;
-import xyz.lotho.me.skycore.storage.impl.ServerStatusPacket;
-import xyz.lotho.me.skycore.storage.impl.ServerUpdateStatusPacket;
+import xyz.lotho.me.skycore.storage.redis.impl.player.GlobalPlayerUpdatePacket;
+import xyz.lotho.me.skycore.storage.redis.impl.server.ServerCommandPacket;
+import xyz.lotho.me.skycore.storage.redis.impl.server.ServerStatusUpdatePacket;
+import xyz.lotho.me.skycore.storage.redis.impl.server.ServerUpdatePacket;
 import xyz.lotho.me.skycore.utils.Utilities;
 
-import java.util.HashMap;
 import java.util.concurrent.ForkJoinPool;
 
 public class RedisManager {
@@ -31,14 +31,8 @@ public class RedisManager {
     private JedisPubSub pubsub;
     private final JsonParser PARSER = new JsonParser();
 
-    private final HashMap<String, Object> packets = new HashMap<>();
-
     public RedisManager(SkyCore instance) {
         this.instance = instance;
-    }
-
-    public boolean isRedisConnected() {
-        return this.subscriberPool != null && !this.subscriberPool.isClosed() && this.publisherPool != null && !this.publisherPool.isClosed();
     }
 
     public void connect() {
@@ -93,13 +87,16 @@ public class RedisManager {
                 String id = jsonObject.get("id").getAsString();
 
                 if (id.equals("ServerStatusPacket")) {
-                    new ServerStatusPacket(RedisManager.this.instance).receive(jsonObject);
+                    new ServerStatusUpdatePacket(RedisManager.this.instance).receive(jsonObject);
                 }
                 if (id.equals("ServerUpdateStatusPacket")) {
-                    new ServerUpdateStatusPacket(RedisManager.this.instance).receive(jsonObject);
+                    new ServerUpdatePacket(RedisManager.this.instance).receive(jsonObject);
                 }
                 if (id.equals("ServerCommandPacket")) {
                     new ServerCommandPacket(RedisManager.this.instance).receive(jsonObject);
+                }
+                if (id.equals("GlobalPlayerUpdatePacket")) {
+                    new GlobalPlayerUpdatePacket(RedisManager.this.instance).receive(jsonObject);
                 }
 
             }
@@ -117,7 +114,7 @@ public class RedisManager {
         });
     }
 
-    public void sendRequest(String channel, JsonObject object) {
+    public void send(String channel, JsonObject object) {
         try {
             if (object == null) throw new IllegalStateException("Object being passed into pool was null.");
 
@@ -133,6 +130,10 @@ public class RedisManager {
 
     public String getChannel() {
         return this.channel;
+    }
+
+    public boolean isRedisConnected() {
+        return this.subscriberPool != null && !this.subscriberPool.isClosed() && this.publisherPool != null && !this.publisherPool.isClosed();
     }
 
     public void close() {

@@ -9,19 +9,18 @@ import java.util.Map;
 public class ServerManager {
 
     private final SkyCore instance;
-
-    private Map<String, Server> serversMap = new HashMap<>();
+    private final Map<String, Server> serversMap = new HashMap<>();
 
     public ServerManager(SkyCore instance) {
         this.instance = instance;
     }
 
-    public Map<String, Server> getServers() {
+    public Map<String, Server> getServersMap() {
         return this.serversMap;
     }
 
     public Server getServer(String serverName) {
-        return this.getServers().get(serverName);
+        return this.getServersMap().get(serverName);
     }
 
     public boolean serverExists(String serverName) {

@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 public class Server {
 
     private String serverName;
-    private String spigotVersion;
+    private String version;
     private float tps1;
     private float tps2;
     private float tps3;
@@ -21,7 +21,7 @@ public class Server {
         this.setServerName(jsonObject.get("serverName").getAsString());
         this.setOnlinePlayers(jsonObject.get("onlinePlayers").getAsInt());
         this.setMaxPlayers(jsonObject.get("maxPlayers").getAsInt());
-        this.setSpigotVersion(jsonObject.get("spigotVersion").getAsString());
+        this.setVersion(jsonObject.get("version").getAsString());
         this.setWhitelisted(jsonObject.get("whitelisted").getAsBoolean());
         this.setTps1(jsonObject.get("tps1").getAsFloat());
         this.setTps2(jsonObject.get("tps2").getAsFloat());
@@ -30,7 +30,7 @@ public class Server {
         this.setOnline(jsonObject.get("online").getAsBoolean());
     }
 
-    public String getLastUpdatedTimeFormatted() {
+    public String getLastUpdatedInSeconds() {
         return new DecimalFormat("#.##").format((float) (System.currentTimeMillis() - this.lastUpdated) / 1000);
     }
 
@@ -46,12 +46,12 @@ public class Server {
         this.serverName = serverName;
     }
 
-    public String getSpigotVersion() {
-        return spigotVersion;
+    public String getVersion() {
+        return version;
     }
 
-    public void setSpigotVersion(String spigotVersion) {
-        this.spigotVersion = spigotVersion;
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public float getTps1() {

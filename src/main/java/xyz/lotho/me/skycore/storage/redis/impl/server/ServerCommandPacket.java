@@ -1,4 +1,4 @@
-package xyz.lotho.me.skycore.storage.impl;
+package xyz.lotho.me.skycore.storage.redis.impl.server;
 
 import com.google.gson.JsonObject;
 import xyz.lotho.me.skycore.SkyCore;
@@ -30,7 +30,7 @@ public class ServerCommandPacket {
 
     public void send(JsonObject jsonObject) {
         jsonObject.addProperty("id", this.getId());
-        this.instance.redisManager.sendRequest(this.instance.redisManager.getChannel(), jsonObject);
+        this.instance.redisManager.send(this.instance.redisManager.getChannel(), jsonObject);
     }
 
     public String getId() {

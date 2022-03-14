@@ -1,15 +1,15 @@
-package xyz.lotho.me.skycore.storage.impl;
+package xyz.lotho.me.skycore.storage.redis.impl.server;
 
 import com.google.gson.JsonObject;
 import xyz.lotho.me.skycore.SkyCore;
 import xyz.lotho.me.skycore.handlers.Server;
 import xyz.lotho.me.skycore.utils.Utilities;
 
-public class ServerUpdateStatusPacket {
+public class ServerUpdatePacket {
 
     private final SkyCore instance;
 
-    public ServerUpdateStatusPacket(SkyCore instance) {
+    public ServerUpdatePacket(SkyCore instance) {
         this.instance = instance;
     }
 
@@ -28,7 +28,7 @@ public class ServerUpdateStatusPacket {
 
     public void send(JsonObject jsonObject) {
         jsonObject.addProperty("id", this.getId());
-        this.instance.redisManager.sendRequest(this.instance.redisManager.getChannel(), jsonObject);
+        this.instance.redisManager.send(this.instance.redisManager.getChannel(), jsonObject);
     }
 
     public String getId() {

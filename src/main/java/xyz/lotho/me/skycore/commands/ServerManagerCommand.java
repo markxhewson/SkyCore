@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import xyz.lotho.me.skycore.SkyCore;
 import xyz.lotho.me.skycore.handlers.Server;
 import xyz.lotho.me.skycore.managers.TPSManager;
-import xyz.lotho.me.skycore.storage.impl.ServerCommandPacket;
+import xyz.lotho.me.skycore.storage.redis.impl.server.ServerCommandPacket;
 import xyz.lotho.me.skycore.utils.Utilities;
 
 public class ServerManagerCommand implements CommandExecutor {
@@ -78,7 +78,7 @@ public class ServerManagerCommand implements CommandExecutor {
         float tps2 = server.getTps2();
         float tps3 = server.getTps3();
 
-        String updatedAgo = server.getLastUpdatedTimeFormatted();
+        String updatedAgo = server.getLastUpdatedInSeconds();
 
         StringBuilder builder = new StringBuilder(Utilities.color("\n&e&lServer Manager &a"));
 
@@ -87,7 +87,7 @@ public class ServerManagerCommand implements CommandExecutor {
         builder.append(Utilities.color(" &e» &fPlayers: &7" + onlineCount + "/" + maxPlayers)).append("\n");
         builder.append(Utilities.color(" &e» &fTPS Data: " + TPSManager.getFormattedTPS(tps) + " " + TPSManager.getFormattedTPS(tps2) + " " + TPSManager.getFormattedTPS(tps3) + " &7(" + TPSManager.getTPSStatus(tps) + "&7)")).append("\n");
         builder.append(Utilities.color(" &e» &fWhitelisted: " + whitelisted)).append("\n");
-        builder.append(Utilities.color(" &e» &fVersion: &6" + server.getSpigotVersion())).append("\n");
+        builder.append(Utilities.color(" &e» &fVersion: &6" + server.getVersion())).append("\n");
         builder.append(Utilities.color(" &e» &fLast Updated: &8" + updatedAgo + "s ago")).append("\n");
         builder.append("\n ");
 
@@ -97,16 +97,16 @@ public class ServerManagerCommand implements CommandExecutor {
     public String getServersFormatted() {
         StringBuilder stringBuilder = new StringBuilder(Utilities.color("\n&e&lServer Manager"));
 
-        this.instance.serverManager.getServers().forEach((serverName, server) -> {
+        this.instance.serverManager.getServersMap().forEach((serverName, server) -> {
             String online = server.isOnline() ? "&aOnline" : "&cOffline";
-            String version = server.getSpigotVersion();
+            String version = server.getVersion();
 
             int onlineCount = server.getOnlinePlayers();
             int maxPlayers = server.getMaxPlayers();
 
             float tps = server.getTps1();
 
-            String updatedAgo = server.getLastUpdatedTimeFormatted();
+            String updatedAgo = server.getLastUpdatedInSeconds();
 
             String line = " &e» &a" + serverName + " &7(" + onlineCount + "/" + maxPlayers + ") : " + online + " &7" + version + " " + "(" + TPSManager.getTPSStatus(tps) + " TPS&7)" + " &8(Updated " + updatedAgo + "s ago)";
             stringBuilder.append("\n").append(Utilities.color(line));
